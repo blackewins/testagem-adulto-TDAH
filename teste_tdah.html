@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Teste de TDAH Adulto</title>
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+.container {
+  background: #ffffffcc;
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+  max-width: 750px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+h1 {
+  color: #006064;
+}
+.question-text {
+  font-size: 22px;
+  margin: 30px 0;
+  min-height: 70px;
+}
+.options label {
+  display: block;
+  margin: 15px 0;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #006064;
+  transition: 0.3s;
+}
+.options label:hover {
+  background: #b2ebf2;
+}
+input[type="radio"] {
+  margin-right: 10px;
+}
+button {
+  padding: 14px 28px;
+  font-size: 18px;
+  border: none;
+  border-radius: 15px;
+  background: #006064;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+button:hover {
+  background: #00838f;
+}
+.progress-bar {
+  height: 12px;
+  background: #cfd8dc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 25px;
+}
+.progress {
+  height: 100%;
+  width: 0%;
+  background: #006064;
+  transition: 0.4s;
+}
+.result {
+  font-size: 22px;
+  font-weight: bold;
+  color: #006064;
+  margin-top: 30px;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Teste de TDAH Adulto</h1>
+<div id="questionContainer"></div>
+<div class="progress-bar">
+  <div class="progress" id="progress"></div>
+</div>
+<div id="resultado" class="result hidden"></div>
+</div>
+
+<script>
+const perguntas = [
+  "Tenho dificuldade em manter atenção em tarefas longas ou monótonas.",
+  "Frequentemente cometo erros por descuido em atividades do trabalho ou estudo.",
+  "Tenho dificuldade em escutar quando alguém fala comigo.",
+  "Costumo não seguir instruções completas em tarefas.",
+  "Tenho dificuldade em organizar tarefas e compromissos.",
+  "Evito tarefas que exigem esforço mental contínuo.",
+  "Perco objetos necessários com frequência (chaves, documentos).",
+  "Sou facilmente distraído por estímulos externos.",
+  "Esqueço compromissos ou prazos importantes.",
+  "Tenho dificuldade em manter a atenção em reuniões ou palestras longas.",
+  "Frequentemente começo tarefas e não consigo terminá-las.",
+  "Tenho dificuldade em prestar atenção em detalhes importantes.",
+  "Sinto necessidade de me mover ou estar sempre ativo.",
+  "Falo demais ou interrompo os outros com frequência.",
+  "Tenho dificuldade em esperar minha vez em conversas ou filas.",
+  "Sinto inquietação, mesmo em situações calmas.",
+  "Tomo decisões sem pensar nas consequências.",
+  "Sinto impaciência em situações que exigem espera.",
+  "Frequentemente começo atividades sem planejar.",
+  "Sinto dificuldade em relaxar ou ficar sentado por muito tempo.",
+  "Frequentemente interrompo ou invado a vida alheia sem perceber.",
+  "Faço comentários impulsivos que podem ser inapropriados.",
+  "Mudanças súbitas de foco me atrapalham.",
+  "Sinto necessidade de fazer várias coisas ao mesmo tempo, mesmo que não termine nenhuma.",
+  "Sinto que minha mente “salta” rapidamente de um assunto para outro.",
+  "Costumo subestimar o tempo necessário para tarefas.",
+  "Sinto frustração ou irritabilidade quando preciso manter atenção prolongada.",
+  "Esqueço frequentemente compromissos sociais ou profissionais.",
+  "Tenho dificuldade em planejar atividades do dia a dia.",
+  "Me envolvo em comportamentos arriscados ou impulsivos."
+];
+
+const scale = ["Nunca","Raramente","Às vezes","Frequentemente","Muito frequentemente"];
+let currentQuestion = 0;
+let respostas = [];
+
+const container = document.getElementById('questionContainer');
+const progressBar = document.getElementById('progress');
+const resultadoDiv = document.getElementById('resultado');
+
+function showQuestion(index) {
+  container.innerHTML = `
+    <div class="question-text">${index+1}. ${perguntas[index]}</div>
+    <div class="options">
+      ${scale.map((op,i) => `<label><input type="radio" name="option" value="${i}"> ${op}</label>`).join('')}
+    </div>
+    <button onclick="nextQuestion()">Próxima</button>
+  `;
+  progressBar.style.width = `${((index)/perguntas.length)*100}%`;
+}
+
+function nextQuestion() {
+  const selected = document.querySelector('input[name="option"]:checked');
+  if(!selected) {
+    alert('Selecione uma resposta para continuar!');
+    return;
+  }
+  respostas.push(parseInt(selected.value));
+  currentQuestion++;
+  if(currentQuestion < perguntas.length) {
+    showQuestion(currentQuestion);
+  } else {
+    progressBar.style.width = "100%";
+    showResult();
+  }
+}
+
+function showResult() {
+  container.innerHTML = '';
+  
+  // Cálculo do risco
+  const total = respostas.reduce((a,b)=>a+b,0);
+  let risco = "";
+  if(total <= 39) risco = "Baixo risco de TDAH";
+  else if(total <= 69) risco = "Risco moderado de TDAH";
+  else risco = "Alto risco de TDAH";
+
+  // Bloqueio do resultado até pagamento
+  resultadoDiv.classList.remove('hidden');
+  resultadoDiv.innerHTML = `
+    Obrigado por completar o teste!<br>
+    Seu resultado detalhado (${risco}) estará disponível após pagamento.
+  `;
+}
+
+showQuestion(currentQuestion);
+</script>
+
+</body>
+</html>
